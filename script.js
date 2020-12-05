@@ -47,6 +47,12 @@ const NEPTUNE_MAX_VEL = 5.50e3;
 const NEPTUNE_MIN_DIS = 4444.5;
 
 // draw an arrow for a vector at a given base position
+/**
+ * Draws an arrow from base in the direction and magnitude of vec
+ * @param {p5.Vector} base the base of the arrow
+ * @param {p5.Vector} vec the vector to be made into an arrow
+ * @param {color} myColor the color of the arrow
+ */
 function drawArrow(base, vec, myColor) {
     push();
     stroke(myColor);
@@ -61,6 +67,11 @@ function drawArrow(base, vec, myColor) {
     pop();
 }
 
+/**
+ * Finds the complement of the input
+ * @param {color} c a color
+ * @returns {color} the complement of `c`
+ */
 function comp_color(c) {
     let r = 255 - red(c);
     let g = 255 - green(c);
@@ -68,6 +79,12 @@ function comp_color(c) {
     return color(r, g, b);
 }
 
+/**
+ * Randomly generates a position and velocity
+ * @param {Number} dis the distance from the planet to the sun
+ * @param {Number} vel the orbital velocity of the planet
+ * @returns {[p5.Vector, p5.Vector]} an two element array with the position and velocity in the respective order
+ */
 function rand_initial(dis, vel) {
     let rand_vec = p5.Vector.random2D();
     let rand_pos = rand_vec.copy().setMag(dis).add(SUN_POS);
@@ -76,30 +93,30 @@ function rand_initial(dis, vel) {
     return [rand_pos, rand_vel];
 }
 
-
-
-
+/**
+ * Calculates the gravitational force between two masses
+ * @param {Mass} m1 the first Mass
+ * @param {Mass} m2 the second Mass
+ * @returns {p5.Vector} the gravitational force acting on `m1` from `m2`
+ */
 function calc_grav_force(m1, m2) {
     let dis = p5.Vector.sub(m2.pos, m1.pos).mult(Math.pow(10, 9));
     let f = dis.setMag(GRAV_CONST * m1.mass * m2.mass / dis.magSq());
     return f;
 }
 
-let obj_arr;
-let mercury_initial;
 function setup() {
-    SUN_POS = createVector(3000, 3000);
+    var x = 3000;
+    var y = 3000;
+    SUN_POS = createVector(x, y);
     frameRate(60);
-    var cnv = createCanvas(8000, 8000);
-    var x = 1500;
-    var y = 1500;
-    //cnv.position(x, y);
-    background(0,0,0);
+    var cnv = createCanvas(6000, 6000);
+    background(0, 0, 0);
     mercury_initial = rand_initial(MERCURY_MIN_DIS, MERCURY_MAX_VEL);
     venus_initial = rand_initial(VENUS_MIN_DIS, VENUS_MAX_VEL);
     earth_initial = rand_initial(EARTH_MIN_DIS, EARTH_MAX_VEL);
     mars_initial = rand_initial(MARS_MIN_DIS, MARS_MAX_VEL);
-    jupiter_initial = rand_initial(JUPITER_MIN_DIS, JUPITER_MAX_VEL);   
+    jupiter_initial = rand_initial(JUPITER_MIN_DIS, JUPITER_MAX_VEL);
     saturn_initial = rand_initial(SATURN_MIN_DIS, SATURN_MAX_VEL);
     uranus_initial = rand_initial(URANUS_MIN_DIS, URANUS_MAX_VEL);
     neptune_initial = rand_initial(NEPTUNE_MIN_DIS, NEPTUNE_MAX_VEL);
@@ -112,13 +129,13 @@ function setup() {
         new Mass(SATURN_MASS, 13, saturn_initial[0], saturn_initial[1]),
         new Mass(URANUS_MASS, 11, uranus_initial[0], uranus_initial[1]),
         new Mass(NEPTUNE_MASS, 11, neptune_initial[0], neptune_initial[1]),
-        new Mass(SUN_MASS, 30, SUN_POS, createVector(0,0))
+        new Mass(SUN_MASS, 30, SUN_POS, createVector(0, 0))
     ];
 }
 
 function draw() {
     clear();
-    background(0,0,0);
+    background(0, 0, 0);
     let max_acc = p5.Vector.mag(obj_arr[0].acc);
     for (var i = 1; i < obj_arr.length; ++i) {
         if (p5.Vector.mag(obj_arr[i].acc) > max_acc) {
@@ -135,7 +152,7 @@ function draw() {
     }
     for (var i = 0; i < obj_arr.length; ++i) {
         let cur_obj = obj_arr[i];
-        
+
         for (var j = 0; j < obj_arr.length; ++j) {
             if (j != i) {
                 let f = calc_grav_force(cur_obj, obj_arr[j]);
